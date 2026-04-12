@@ -11,3 +11,10 @@ build/
 .ruff_cache/
 *.coverage
 htmlcov/
+.claude
+.DS_Store
+.env
+workspace/*
+!workspace/.gitkeep
+reports/*
+!reports/.gitkeep

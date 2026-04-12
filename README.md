@@ -12,6 +12,7 @@
 - [Возможности](#возможности)
 - [Установка](#установка)
 - [Быстрый старт](#быстрый-старт)
+- [Docker](#docker)
 - [Анализаторы](#анализаторы)
 - [Использование](#использование)
 - [Trust Score](#trust-score)
@@ -115,6 +116,108 @@ skills-verified https://github.com/user/repo --output report.json
 # Запустить только быстрые анализаторы
 skills-verified https://github.com/user/repo --skip bandit,semgrep,cve
 ```
+
+---
+
+## Docker
+
+Контейнеризированный запуск — без локальной установки Python, с предустановленными Bandit/Semgrep/pip-audit/npm. Удобно для CI/CD или одноразовых проверок на чужих машинах.
+
+### Сборка образа
+
+```bash
+docker compose build
+```
+
+Один раз собирается образ ~500MB с Python 3.11, Node.js, всеми внешними инструментами и самой утилитой.
+
+### Запуск через docker compose
+
+**Сканирование GitHub URL:**
+
+```bash
+# По умолчанию — cc-1c-skills
+docker compose run --rm scan-url
+
+# Свой репо через переменную окружения
+REPO_URL=https://github.com/user/repo docker compose run --rm scan-url
+
+# Отчёт окажется в ./reports/report.json
+```
+
+**Сканирование локального репо:**
+
+```bash
+# Положи репозиторий в ./workspace/
+cp -r /path/to/repo ./workspace/
+
+docker compose run --rm scan-local
+```
+
+**Произвольная команда с любыми флагами:**
+
+```bash
+docker compose run --rm skills-verified \
+  https://github.com/user/repo \
+  --skip bandit,semgrep \
+  --output /reports/report.json
+```
+
+### Запуск через docker напрямую
+
+```bash
+# Собрать
+docker build -t skills-verified .
+
+# Просканировать URL, отчёт в текущую директорию
+docker run --rm \
+  -v "$PWD/reports:/reports" \
+  skills-verified https://github.com/user/repo --output /reports/report.json
+
+# Просканировать локальный путь
+docker run --rm \
+  -v "/path/to/repo:/workspace:ro" \
+  -v "$PWD/reports:/reports" \
+  skills-verified /workspace --output /reports/report.json
+
+# С LLM-анализом
+docker run --rm \
+  -v "$PWD/reports:/reports" \
+  -e SV_LLM_URL=https://api.openai.com/v1 \
+  -e SV_LLM_MODEL=gpt-4o \
+  -e SV_LLM_KEY=sk-xxx \
+  skills-verified https://github.com/user/repo --output /reports/report.json
+```
+
+### LLM через env-файл
+
+Создай `.env` в корне проекта:
+
+```bash
+SV_LLM_URL=https://api.openai.com/v1
+SV_LLM_MODEL=gpt-4o
+SV_LLM_KEY=sk-xxx
+REPO_URL=https://github.com/user/repo
+```
+
+Затем:
+
+```bash
+docker compose run --rm scan-url
+```
+
+Docker Compose автоматически подхватит переменные из `.env`.
+
+### Volumes
+
+Образ определяет два volume:
+
+| Volume | Описание |
+|---|---|
+| `/workspace` | Монтируется локальный репо для сканирования (read-only рекомендуется) |
+| `/reports` | Сюда пишутся JSON-отчёты |
+
+В `docker-compose.yml` они мапятся в `./workspace` и `./reports` текущей директории.
 
 ---
 
