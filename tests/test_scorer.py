@@ -65,8 +65,8 @@ def test_overall_score_is_average():
     scorer = Scorer()
     categories = scorer.score_categories(findings)
     overall = scorer.compute_overall(categories)
-    # (75 + 100 + 100 + 100 + 100) / 5 = 95
-    assert overall == 95
+    # (75 + 100*8) / 9 = 97 (rounded)
+    assert overall == 97
 
 
 def test_multiple_severities():

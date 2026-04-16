@@ -12,6 +12,7 @@ build/
 *.coverage
 htmlcov/
 .claude
+!tests/fixtures/fake_repo/.claude
 .DS_Store
 .env
 workspace/*

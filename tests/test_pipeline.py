@@ -18,7 +18,7 @@ class FakeAnalyzer(Analyzer):
     def is_available(self) -> bool:
         return self._available
 
-    def analyze(self, repo_path: Path) -> list[Finding]:
+    def analyze(self, repo_path: Path, **kwargs) -> list[Finding]:
         return self._findings
 
 
@@ -28,7 +28,7 @@ class CrashingAnalyzer(Analyzer):
     def is_available(self) -> bool:
         return True
 
-    def analyze(self, repo_path: Path) -> list[Finding]:
+    def analyze(self, repo_path: Path, **kwargs) -> list[Finding]:
         raise RuntimeError("boom")
 
 

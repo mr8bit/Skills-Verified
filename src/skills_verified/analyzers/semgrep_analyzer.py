@@ -22,7 +22,7 @@ class SemgrepAnalyzer(Analyzer):
     def is_available(self) -> bool:
         return shutil.which("semgrep") is not None
 
-    def analyze(self, repo_path: Path) -> list[Finding]:
+    def analyze(self, repo_path: Path, **kwargs) -> list[Finding]:
         try:
             result = subprocess.run(
                 [

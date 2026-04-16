@@ -5,6 +5,7 @@ from pathlib import Path
 from skills_verified.core.analyzer import Analyzer
 from skills_verified.core.models import Finding, Report
 from skills_verified.core.scorer import Scorer
+from skills_verified.platforms.detector import PlatformDetector
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +20,18 @@ class Pipeline:
         all_findings: list[Finding] = []
         used: list[str] = []
 
+        detector = PlatformDetector()
+        platforms = detector.detect(repo_path)
+        if platforms:
+            logger.info("Detected platforms: %s", [p.name for p in platforms])
+
         for analyzer in self.analyzers:
             if not analyzer.is_available():
                 logger.warning("Analyzer %s is not available, skipping", analyzer.name)
                 continue
             used.append(analyzer.name)
             try:
-                findings = analyzer.analyze(repo_path)
+                findings = analyzer.analyze(repo_path, platforms=platforms)
                 all_findings.extend(findings)
             except Exception:
                 logger.exception("Analyzer %s crashed", analyzer.name)

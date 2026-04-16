@@ -1,0 +1,45 @@
+version: "1.0"
+updated: "2026-04-16"
+description: "Known malicious actors identified through security research on skill/plugin marketplaces."
+
+sources:
+  - "Snyk ToxicSkills (Feb 2026)"
+  - "Straiker Research (2026)"
+  - "Koi Security ClawHavoc (2026)"
+
+authors:
+  - name: "26medias"
+    platform: clawhub
+    source: "Straiker Research (2026)"
+    severity: CRITICAL
+    description: "Identified as part of the ClawHavoc campaign distributing malicious skills with embedded reverse shells and credential exfiltration."
+
+  - name: "BobVonNeumann"
+    platform: clawhub
+    source: "Straiker Research (2026)"
+    severity: CRITICAL
+    description: "Linked to the ClawHavoc campaign. Published skills containing obfuscated download-and-execute payloads."
+
+  - name: "zaycv"
+    platform: clawhub
+    source: "Snyk ToxicSkills (Feb 2026)"
+    severity: CRITICAL
+    description: "Part of the ToxicSkills campaign. Published skills with base64-encoded credential theft routines."
+
+  - name: "Aslaep123"
+    platform: clawhub
+    source: "Snyk ToxicSkills (Feb 2026)"
+    severity: CRITICAL
+    description: "Identified in the ToxicSkills campaign. Skills contained obfuscated environment variable exfiltration."
+
+  - name: "pepe276"
+    platform: clawhub
+    source: "Snyk ToxicSkills (Feb 2026)"
+    severity: CRITICAL
+    description: "Part of the ToxicSkills campaign. Published skills that disabled security tools before exfiltrating data."
+
+  - name: "moonshine-100rze"
+    platform: clawhub
+    source: "Snyk ToxicSkills (Feb 2026)"
+    severity: CRITICAL
+    description: "Linked to the ToxicSkills campaign. Published skills that fetched and executed external malware payloads."

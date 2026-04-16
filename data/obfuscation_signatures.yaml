@@ -1,0 +1,107 @@
+version: "1.0"
+updated: "2026-04-16"
+description: "Signatures for detecting code obfuscation techniques commonly used to hide malicious payloads."
+
+signatures:
+  - id: OB001
+    title: "Hex escape sequence chain"
+    description: "4 or more consecutive hex escape sequences (\\xNN), commonly used to obfuscate shell commands or payloads."
+    pattern: "(\\\\x[0-9a-fA-F]{2}){4,}"
+    severity: HIGH
+    languages:
+      - python
+      - javascript
+
+  - id: OB002
+    title: "String.fromCharCode obfuscation"
+    description: "String.fromCharCode called with 4+ numeric arguments to reconstruct obfuscated strings."
+    pattern: "String\\.fromCharCode\\s*\\(\\s*\\d+\\s*(,\\s*\\d+\\s*){3,}\\)"
+    severity: HIGH
+    languages:
+      - javascript
+
+  - id: OB003
+    title: "Python chr() concatenation chain"
+    description: "Three or more chr() calls concatenated to build obfuscated strings."
+    pattern: "chr\\s*\\(\\s*\\d+\\s*\\)\\s*\\+\\s*chr\\s*\\(\\s*\\d+\\s*\\)\\s*\\+\\s*chr\\s*\\(\\s*\\d+\\s*\\)"
+    severity: HIGH
+    languages:
+      - python
+
+  - id: OB004
+    title: "Base64 decode combined with exec or eval"
+    description: "Base64-decoded content passed directly to exec() or eval(), a classic obfuscation-to-execution pattern."
+    pattern: "(exec|eval)\\s*\\(.*b(ase)?64.*(decode|b64decode)"
+    severity: CRITICAL
+    languages:
+      - python
+      - javascript
+
+  - id: OB005
+    title: "String concatenation building commands"
+    description: "Strings split and concatenated to avoid keyword detection (e.g., 'cu'+'rl', 'ev'+'al')."
+    pattern: "[\"'][a-z]{1,4}[\"']\\s*\\+\\s*[\"'][a-z]{1,4}[\"']"
+    severity: MEDIUM
+    languages:
+      - python
+      - javascript
+      - ruby
+
+  - id: OB006
+    title: "Unicode homoglyph in identifiers"
+    description: "Cyrillic or other non-ASCII characters used in identifiers that visually resemble Latin characters, enabling trojan source attacks."
+    pattern: "[\\u0400-\\u04FF]"
+    severity: HIGH
+    languages:
+      - python
+      - javascript
+      - ruby
+
+  - id: OB007
+    title: "Nested eval/exec with compile"
+    description: "eval or exec wrapping a compile() call, enabling multi-stage code execution that evades simple static analysis."
+    pattern: "(eval|exec)\\s*\\(\\s*compile\\s*\\("
+    severity: CRITICAL
+    languages:
+      - python
+
+  - id: OB008
+    title: "JavaScript eval(atob(...)) pattern"
+    description: "eval() applied to atob() base64 decoded content, a common JavaScript obfuscation technique."
+    pattern: "eval\\s*\\(\\s*atob\\s*\\("
+    severity: CRITICAL
+    languages:
+      - javascript
+
+  - id: OB009
+    title: "ROT13 decode with exec"
+    description: "ROT13 decoding (codecs.decode with rot_13 or rot13) combined with exec to run obfuscated code."
+    pattern: "(exec|eval)\\s*\\(.*codecs\\.decode\\s*\\(.*rot.?13"
+    severity: HIGH
+    languages:
+      - python
+
+  - id: OB010
+    title: "XOR decode loop with exec"
+    description: "XOR-based decoding loop followed by exec(), used to decrypt and execute embedded payloads."
+    pattern: "(exec|eval)\\s*\\(.*\\bxor\\b|\\^\\s*\\d+.*\\b(exec|eval)\\b"
+    severity: HIGH
+    languages:
+      - python
+      - javascript
+
+  - id: OB011
+    title: "getattr/setattr obfuscation"
+    description: "getattr() or __import__() used with string manipulation to dynamically resolve dangerous functions."
+    pattern: "getattr\\s*\\(.*,\\s*[\"'].*[\"']\\s*\\)|__import__\\s*\\("
+    severity: HIGH
+    languages:
+      - python
+
+  - id: OB012
+    title: "JavaScript Function constructor"
+    description: "new Function() or Function() used to construct executable code from strings, bypassing eval detection."
+    pattern: "(new\\s+)?Function\\s*\\(\\s*[\"']"
+    severity: HIGH
+    languages:
+      - javascript

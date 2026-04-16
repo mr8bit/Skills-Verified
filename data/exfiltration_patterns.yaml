@@ -1,0 +1,120 @@
+version: "1.0"
+updated: "2026-04-16"
+description: "Signatures for detecting data exfiltration techniques including credential theft, environment variable harvesting, and covert data transfer."
+
+signatures:
+  - id: EX001
+    title: "DNS exfiltration via subdomain construction"
+    description: "Data encoded into DNS subdomain labels to exfiltrate information through DNS queries."
+    pattern: "\\b(getaddrinfo|gethostbyname|resolve|dns\\.lookup|nslookup)\\s*\\(.*\\+.*\\.(com|net|org|io|xyz)\\b"
+    severity: HIGH
+    languages:
+      - python
+      - javascript
+      - ruby
+
+  - id: EX002
+    title: "Environment variable bulk harvesting (Python)"
+    description: "Bulk copy of environment variables via os.environ, often the first step in credential exfiltration."
+    pattern: "os\\.environ\\.copy\\s*\\(\\)|dict\\s*\\(\\s*os\\.environ\\s*\\)"
+    severity: MEDIUM
+    languages:
+      - python
+
+  - id: EX003
+    title: "Environment variable bulk harvesting (Node.js)"
+    description: "Bulk access to process.env in Node.js, collecting all environment variables."
+    pattern: "Object\\.(keys|values|entries|assign)\\s*\\(\\s*process\\.env\\s*\\)|JSON\\.stringify\\s*\\(\\s*process\\.env\\s*\\)"
+    severity: MEDIUM
+    languages:
+      - javascript
+
+  - id: EX004
+    title: "HTTP POST with environment data or file content"
+    description: "HTTP POST request sending environment variables or file content to a remote endpoint."
+    pattern: "(requests\\.post|http\\.request|fetch|axios\\.post|urllib).*\\b(os\\.environ|process\\.env|open\\s*\\()"
+    severity: HIGH
+    languages:
+      - python
+      - javascript
+
+  - id: EX005
+    title: "Credential file reading"
+    description: "Reading well-known credential files such as SSH keys, AWS credentials, npmrc tokens, or git configuration."
+    pattern: "open\\s*\\(.*(\\.ssh/|id_rsa|\\.aws/credentials|\\.npmrc|\\.gitconfig|\\.netrc|\\.gnupg|\\.docker/config)"
+    severity: HIGH
+    languages:
+      - python
+      - javascript
+      - ruby
+
+  - id: EX006
+    title: "File content sent via HTTP"
+    description: "File content read and sent over HTTP in a single operation chain."
+    pattern: "(read|readFile|read_text|read_bytes).*\\b(requests\\.|http\\.|fetch\\(|axios\\.|urllib)|\\b(requests\\.|http\\.|fetch\\(|axios\\.).*open\\s*\\("
+    severity: HIGH
+    languages:
+      - python
+      - javascript
+
+  - id: EX007
+    title: "Clipboard reading with network send"
+    description: "Clipboard content read and potentially sent to a remote endpoint."
+    pattern: "(pyperclip|clipboard|pbpaste|xclip|xsel|GetClipboardData).*\\b(requests\\.|fetch|http\\.|socket)"
+    severity: MEDIUM
+    languages:
+      - python
+      - javascript
+
+  - id: EX008
+    title: "Base64 encoding of sensitive data before network send"
+    description: "Sensitive data is base64-encoded before being sent over the network to evade content inspection."
+    pattern: "(b64encode|btoa|Buffer\\.from).*\\b(requests\\.|fetch|http\\.|axios|urllib)|\\b(requests\\.|fetch|http\\.).*\\b(b64encode|btoa)"
+    severity: HIGH
+    languages:
+      - python
+      - javascript
+
+  - id: EX009
+    title: "Temporary file staging of secrets"
+    description: "Sensitive data written to /tmp or temp directory, potentially for later exfiltration."
+    pattern: "open\\s*\\(\\s*[\"'](/tmp/|tempfile).*\\b(environ|password|secret|token|credential|api.?key)"
+    severity: MEDIUM
+    languages:
+      - python
+      - javascript
+
+  - id: EX010
+    title: "curl/wget with file upload"
+    description: "curl or wget used to upload file content to a remote server."
+    pattern: "(curl|wget)\\s+.*(-d\\s+@|-F\\s+.*=@|--upload-file|--data-binary\\s+@|--post-file)"
+    severity: HIGH
+    languages:
+      - bash
+      - shell
+      - python
+
+  - id: EX011
+    title: "Node.js fetch/axios with environment data"
+    description: "Node.js fetch or axios sending environment variables or secrets to a remote server."
+    pattern: "(fetch|axios)\\s*\\(.*\\{.*process\\.env|process\\.env.*\\b(fetch|axios)\\s*\\("
+    severity: HIGH
+    languages:
+      - javascript
+
+  - id: EX012
+    title: "Keylogger pattern"
+    description: "Keyboard input capture hooks combined with data storage or transmission."
+    pattern: "(pynput|keyboard\\.on_press|SetWindowsHookEx|CGEventTapCreate|addEventListener.*keydown)"
+    severity: HIGH
+    languages:
+      - python
+      - javascript
+
+  - id: EX013
+    title: "Screenshot capture and send"
+    description: "Screen capture followed by network transmission of the image data."
+    pattern: "(ImageGrab|screenshot|pyautogui\\.screenshot|mss).*\\b(requests\\.|fetch|http\\.|socket)"
+    severity: HIGH
+    languages:
+      - python

@@ -25,7 +25,7 @@ class CveAnalyzer(Analyzer):
     def is_available(self) -> bool:
         return shutil.which("pip-audit") is not None or shutil.which("npm") is not None
 
-    def analyze(self, repo_path: Path) -> list[Finding]:
+    def analyze(self, repo_path: Path, **kwargs) -> list[Finding]:
         findings: list[Finding] = []
         req_files = (
             list(repo_path.rglob("requirements*.txt"))

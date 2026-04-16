@@ -73,7 +73,7 @@ class PatternAnalyzer(Analyzer):
     def is_available(self) -> bool:
         return True
 
-    def analyze(self, repo_path: Path) -> list[Finding]:
+    def analyze(self, repo_path: Path, **kwargs) -> list[Finding]:
         findings: list[Finding] = []
         for file_path in repo_path.rglob("*"):
             if not file_path.is_file():

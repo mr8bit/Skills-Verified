@@ -16,6 +16,10 @@ class Category(Enum):
     GUARDRAILS = "guardrails"
     PERMISSIONS = "permissions"
     SUPPLY_CHAIN = "supply_chain"
+    MCP_SECURITY = "mcp_security"
+    CONFIG_INJECTION = "config_injection"
+    OBFUSCATION = "obfuscation"
+    EXFILTRATION = "exfiltration"
 
 
 class Grade(Enum):

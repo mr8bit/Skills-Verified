@@ -5,9 +5,18 @@ from click.testing import CliRunner
 from skills_verified.cli import main
 from skills_verified.core.models import Category, Grade, Severity
 from skills_verified.core.pipeline import Pipeline
-from skills_verified.analyzers.pattern_analyzer import PatternAnalyzer
+from skills_verified.analyzers.behavioral_analyzer import BehavioralAnalyzer
+from skills_verified.analyzers.config_injection_analyzer import ConfigInjectionAnalyzer
+from skills_verified.analyzers.exfiltration_analyzer import ExfiltrationAnalyzer
 from skills_verified.analyzers.guardrails_analyzer import GuardrailsAnalyzer
+from skills_verified.analyzers.known_threats_analyzer import KnownThreatsAnalyzer
+from skills_verified.analyzers.mcp_analyzer import MCPAnalyzer
+from skills_verified.analyzers.metadata_analyzer import MetadataAnalyzer
+from skills_verified.analyzers.obfuscation_analyzer import ObfuscationAnalyzer
+from skills_verified.analyzers.pattern_analyzer import PatternAnalyzer
 from skills_verified.analyzers.permissions_analyzer import PermissionsAnalyzer
+from skills_verified.analyzers.privilege_analyzer import PrivilegeAnalyzer
+from skills_verified.analyzers.reverse_shell_analyzer import ReverseShellAnalyzer
 from skills_verified.analyzers.supply_chain_analyzer import SupplyChainAnalyzer
 
 
@@ -17,13 +26,22 @@ def test_full_pipeline_on_fake_repo(fake_repo_path):
         GuardrailsAnalyzer(),
         PermissionsAnalyzer(),
         SupplyChainAnalyzer(),
+        ObfuscationAnalyzer(),
+        ReverseShellAnalyzer(),
+        ExfiltrationAnalyzer(),
+        BehavioralAnalyzer(),
+        MCPAnalyzer(),
+        ConfigInjectionAnalyzer(),
+        MetadataAnalyzer(),
+        KnownThreatsAnalyzer(),
+        PrivilegeAnalyzer(),
     ]
     pipeline = Pipeline(analyzers=analyzers)
     report = pipeline.run(repo_path=fake_repo_path, repo_url="test://fake")
 
     assert len(report.findings) > 0
     assert report.overall_score < 100
-    assert len(report.categories) == 5
+    assert len(report.categories) == 9
 
     categories_with_findings = {f.category for f in report.findings}
     assert Category.CODE_SAFETY in categories_with_findings

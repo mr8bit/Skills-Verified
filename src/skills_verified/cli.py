@@ -5,11 +5,20 @@ import click
 from rich.console import Console
 
 from skills_verified.analyzers.bandit_analyzer import BanditAnalyzer
+from skills_verified.analyzers.behavioral_analyzer import BehavioralAnalyzer
+from skills_verified.analyzers.config_injection_analyzer import ConfigInjectionAnalyzer
 from skills_verified.analyzers.cve_analyzer import CveAnalyzer
+from skills_verified.analyzers.exfiltration_analyzer import ExfiltrationAnalyzer
 from skills_verified.analyzers.guardrails_analyzer import GuardrailsAnalyzer
+from skills_verified.analyzers.known_threats_analyzer import KnownThreatsAnalyzer
 from skills_verified.analyzers.llm_analyzer import LlmAnalyzer, LlmConfig
+from skills_verified.analyzers.mcp_analyzer import MCPAnalyzer
+from skills_verified.analyzers.metadata_analyzer import MetadataAnalyzer
+from skills_verified.analyzers.obfuscation_analyzer import ObfuscationAnalyzer
 from skills_verified.analyzers.pattern_analyzer import PatternAnalyzer
 from skills_verified.analyzers.permissions_analyzer import PermissionsAnalyzer
+from skills_verified.analyzers.privilege_analyzer import PrivilegeAnalyzer
+from skills_verified.analyzers.reverse_shell_analyzer import ReverseShellAnalyzer
 from skills_verified.analyzers.semgrep_analyzer import SemgrepAnalyzer
 from skills_verified.analyzers.supply_chain_analyzer import SupplyChainAnalyzer
 from skills_verified.core.pipeline import Pipeline
@@ -56,6 +65,15 @@ def main(
         PermissionsAnalyzer(),
         SupplyChainAnalyzer(),
         LlmAnalyzer(config=llm_config),
+        ObfuscationAnalyzer(),
+        ReverseShellAnalyzer(),
+        ExfiltrationAnalyzer(),
+        BehavioralAnalyzer(),
+        MCPAnalyzer(),
+        ConfigInjectionAnalyzer(),
+        MetadataAnalyzer(),
+        KnownThreatsAnalyzer(),
+        PrivilegeAnalyzer(),
     ]
 
     skip_set = set(skip.split(",")) if skip else set()

@@ -1,0 +1,147 @@
+version: "1.0"
+updated: "2026-04-16"
+description: "Signatures for detecting reverse shell, bind shell, and web shell patterns across multiple languages."
+
+signatures:
+  - id: RS001
+    title: "Bash TCP reverse shell"
+    description: "Bash reverse shell using /dev/tcp to connect back to an attacker-controlled host."
+    pattern: "bash\\s+-i\\s+>&\\s*/dev/tcp/"
+    severity: CRITICAL
+    languages:
+      - bash
+      - shell
+
+  - id: RS002
+    title: "Netcat reverse shell with -e flag"
+    description: "Netcat used with -e to pipe a shell to a remote host."
+    pattern: "\\bnc\\b.*\\s-e\\s+/bin/(sh|bash|zsh)"
+    severity: CRITICAL
+    languages:
+      - bash
+      - shell
+      - python
+
+  - id: RS003
+    title: "Netcat reverse shell with -c flag"
+    description: "Netcat used with -c flag to execute a shell command on connection."
+    pattern: "\\bnc(at)?\\b.*\\s-c\\s+['\"]?/bin/(sh|bash)"
+    severity: CRITICAL
+    languages:
+      - bash
+      - shell
+
+  - id: RS004
+    title: "Python socket reverse shell"
+    description: "Python using socket.socket with subprocess and connect to establish a reverse shell."
+    pattern: "socket\\.socket\\s*\\(.*subprocess.*connect|connect.*socket\\.socket\\s*\\(.*subprocess"
+    severity: CRITICAL
+    languages:
+      - python
+
+  - id: RS005
+    title: "Python pty.spawn shell"
+    description: "Python pty.spawn used to spawn an interactive shell, often part of a reverse shell chain."
+    pattern: "pty\\.spawn\\s*\\(\\s*[\"']/bin/(sh|bash|zsh)[\"']"
+    severity: CRITICAL
+    languages:
+      - python
+
+  - id: RS006
+    title: "Ruby socket reverse shell"
+    description: "Ruby TCPSocket or Socket used to establish a reverse shell connection."
+    pattern: "TCPSocket\\.(new|open)\\s*\\(.*exec\\s*[\"']/bin/(sh|bash)"
+    severity: CRITICAL
+    languages:
+      - ruby
+
+  - id: RS007
+    title: "Perl socket reverse shell"
+    description: "Perl using Socket module or IO::Socket to create a reverse shell."
+    pattern: "IO::Socket::INET->new\\s*\\(.*exec\\s*[\"']/bin/(sh|bash)"
+    severity: CRITICAL
+    languages:
+      - perl
+
+  - id: RS008
+    title: "PHP reverse shell via fsockopen"
+    description: "PHP fsockopen combined with shell_exec, passthru, or system to create a reverse shell."
+    pattern: "fsockopen\\s*\\(.*\\b(shell_exec|passthru|system|exec)\\s*\\("
+    severity: CRITICAL
+    languages:
+      - php
+
+  - id: RS009
+    title: "PowerShell TCPClient reverse shell"
+    description: "PowerShell System.Net.Sockets.TCPClient used to connect to a remote host for shell access."
+    pattern: "New-Object\\s+System\\.Net\\.Sockets\\.TCPClient"
+    severity: CRITICAL
+    languages:
+      - powershell
+
+  - id: RS010
+    title: "PowerShell Invoke-Expression with DownloadString"
+    description: "PowerShell downloading and immediately executing remote code via IEX/Invoke-Expression."
+    pattern: "(IEX|Invoke-Expression).*\\(.*\\.(DownloadString|DownloadData)\\s*\\("
+    severity: CRITICAL
+    languages:
+      - powershell
+
+  - id: RS011
+    title: "Node.js child_process reverse shell"
+    description: "Node.js child_process module used with net.Socket to create a reverse shell."
+    pattern: "child_process.*net\\.Socket|net\\.Socket.*child_process"
+    severity: CRITICAL
+    languages:
+      - javascript
+
+  - id: RS012
+    title: "Bind shell via socket.bind and subprocess"
+    description: "Socket bound to a port with subprocess to accept incoming shell connections (bind shell)."
+    pattern: "socket\\.bind\\s*\\(.*subprocess|subprocess.*socket\\.bind\\s*\\("
+    severity: HIGH
+    languages:
+      - python
+
+  - id: RS013
+    title: "Web shell pattern"
+    description: "HTTP handler combined with os.system or subprocess, forming a web-accessible command execution endpoint."
+    pattern: "(BaseHTTPRequestHandler|HTTPServer|http\\.server).*\\b(os\\.system|subprocess|exec)\\b"
+    severity: HIGH
+    languages:
+      - python
+
+  - id: RS014
+    title: "Socat reverse shell"
+    description: "Socat used to forward a shell to a remote host via TCP."
+    pattern: "socat\\s+.*TCP[46]?:.*EXEC:[\"']?/bin/(sh|bash)"
+    severity: CRITICAL
+    languages:
+      - bash
+      - shell
+
+  - id: RS015
+    title: "Telnet reverse shell"
+    description: "Telnet-based reverse shell piping input/output through a named pipe or direct connection."
+    pattern: "telnet\\s+\\S+\\s+\\d+\\s*\\|\\s*/bin/(sh|bash)|mkfifo.*telnet"
+    severity: CRITICAL
+    languages:
+      - bash
+      - shell
+
+  - id: RS016
+    title: "Python os.dup2 shell redirection"
+    description: "Python os.dup2 used to redirect stdin/stdout/stderr to a socket for reverse shell."
+    pattern: "os\\.dup2\\s*\\(.*\\b(0|1|2)\\b"
+    severity: CRITICAL
+    languages:
+      - python
+
+  - id: RS017
+    title: "Ncat reverse shell with --exec"
+    description: "Ncat (Nmap netcat) used with --exec or --sh-exec to create a reverse shell."
+    pattern: "ncat\\b.*--(exec|sh-exec)\\s+[\"']?/bin/(sh|bash)"
+    severity: CRITICAL
+    languages:
+      - bash
+      - shell

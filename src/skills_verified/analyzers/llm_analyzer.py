@@ -62,7 +62,7 @@ class LlmAnalyzer(Analyzer):
     def is_available(self) -> bool:
         return self.config is not None
 
-    def analyze(self, repo_path: Path) -> list[Finding]:
+    def analyze(self, repo_path: Path, **kwargs) -> list[Finding]:
         if not self.config:
             return []
         try:

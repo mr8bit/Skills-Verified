@@ -31,7 +31,7 @@ class SupplyChainAnalyzer(Analyzer):
     def is_available(self) -> bool:
         return True
 
-    def analyze(self, repo_path: Path) -> list[Finding]:
+    def analyze(self, repo_path: Path, **kwargs) -> list[Finding]:
         findings: list[Finding] = []
         findings.extend(self._check_package_json(repo_path))
         findings.extend(self._check_setup_py(repo_path))

@@ -1,0 +1,123 @@
+version: "1.0"
+updated: "2026-04-16"
+description: "Signatures derived from known malicious campaigns targeting skill/plugin ecosystems."
+
+campaigns:
+  - id: CAMP001
+    name: "ClawHavoc"
+    description: "Large-scale campaign involving 335 malicious skills on ClawHub. Skills contained password-protected ZIP downloads, PowerShell download-and-execute sequences, and connections to known C2 domains."
+    source: "Koi Security ClawHavoc (2026)"
+    patterns:
+      - pattern: "(Invoke-WebRequest|wget|curl)\\s+.*\\.zip.*(-Password|-p\\s)"
+        severity: CRITICAL
+        description: "Password-protected ZIP download — files requiring passwords at install time are a strong indicator of hidden payloads."
+
+      - pattern: "powershell\\s+.*-e(ncodedcommand)?\\s+[A-Za-z0-9+/=]{20,}"
+        severity: CRITICAL
+        description: "PowerShell encoded command execution — base64-encoded PowerShell commands used to evade detection."
+
+      - pattern: "(Invoke-Expression|IEX)\\s*\\(\\s*(New-Object\\s+Net\\.WebClient)?\\.?DownloadString\\s*\\("
+        severity: CRITICAL
+        description: "PowerShell download-and-execute via Invoke-Expression with DownloadString."
+
+      - pattern: "(Start-Process|Invoke-Item)\\s+.*\\.(exe|bat|cmd|ps1|vbs)"
+        severity: HIGH
+        description: "Execution of downloaded executable or script files."
+
+      - pattern: "\\b\\w+\\.(duckdns\\.org|ngrok\\.io|serveo\\.net|portmap\\.io|localhost\\.run)\\b"
+        severity: CRITICAL
+        description: "Connection to dynamic DNS or tunneling services commonly used as C2 infrastructure."
+
+      - pattern: "Expand-Archive.*-Force|-DestinationPath.*\\$env:(TEMP|APPDATA)"
+        severity: HIGH
+        description: "Archive extraction to temporary or user-writable directories, common in payload staging."
+    indicators:
+      files:
+        - "install.ps1"
+        - "setup.bat"
+        - "payload.zip"
+        - "loader.exe"
+      strings:
+        - "duckdns.org"
+        - "ngrok.io"
+        - "Expand-Archive"
+        - "Start-Process"
+        - "Hidden"
+        - "-WindowStyle Hidden"
+
+  - id: CAMP002
+    name: "ToxicSkills"
+    description: "Obfuscated exfiltration campaign discovered by Snyk. Skills used base64-encoded credential theft, disabled security tools, and distributed external malware from compromised repositories."
+    source: "Snyk ToxicSkills (Feb 2026)"
+    patterns:
+      - pattern: "base64\\.(b64decode|decodebytes)\\s*\\(.*\\b(exec|eval)\\b|\\b(exec|eval)\\b.*base64\\.(b64decode|decodebytes)"
+        severity: CRITICAL
+        description: "Base64-decoded content passed to exec/eval — classic obfuscated credential theft pattern."
+
+      - pattern: "(os\\.environ|process\\.env).*\\b(requests\\.post|fetch|axios|urllib)"
+        severity: CRITICAL
+        description: "Environment variables collected and sent to an external endpoint."
+
+      - pattern: "(Set-MpPreference\\s+-DisableRealtimeMonitoring|systemctl\\s+stop\\s+.*guard|\\biptables\\s+-F\\b)"
+        severity: CRITICAL
+        description: "Security tool or firewall disablement to avoid detection during payload execution."
+
+      - pattern: "(pip|npm)\\s+install\\s+.*--index-url\\s+https?://(?!pypi\\.org|registry\\.npmjs\\.org)"
+        severity: HIGH
+        description: "Package installation from non-standard registry, potentially hosting malicious packages."
+
+      - pattern: "subprocess\\.\\w+\\s*\\(\\s*\\[?[\"']curl[\"'].*raw\\.githubusercontent\\.com"
+        severity: HIGH
+        description: "Fetching and executing raw content from GitHub, a common malware distribution vector."
+    indicators:
+      files:
+        - "__init__.py"
+        - "setup.py"
+        - "postinstall.sh"
+      strings:
+        - "b64decode"
+        - "os.environ"
+        - "DisableRealtimeMonitoring"
+        - "raw.githubusercontent.com"
+        - "--index-url"
+
+  - id: CAMP003
+    name: "ClaudeFraud"
+    description: "Malicious VS Code extension campaign using fake Claude AI branding. Extensions harvested credentials from IDE configuration, installed persistent backdoors, and exfiltrated workspace data."
+    source: "Security community reports (2026)"
+    patterns:
+      - pattern: "vscode\\.workspace\\.getConfiguration.*\\b(password|token|secret|apiKey|credential)"
+        severity: CRITICAL
+        description: "VS Code configuration access targeting stored credentials and API keys."
+
+      - pattern: "(claude|anthropic|sonnet|opus).*\\b(extension|plugin).*\\b(install|activate)"
+        severity: HIGH
+        description: "Fake Claude/Anthropic branding in extension metadata to social-engineer trust."
+
+      - pattern: "globalState\\.update\\s*\\(.*\\b(token|session|auth|key)\\b"
+        severity: HIGH
+        description: "Persistent storage of harvested credentials in VS Code global state."
+
+      - pattern: "fs\\.(readFile|readFileSync)\\s*\\(.*(\\.vscode|settings\\.json|keybindings|extensions\\.json)"
+        severity: HIGH
+        description: "Reading VS Code configuration files to extract stored secrets or alter IDE behavior."
+
+      - pattern: "(child_process|exec|spawn).*\\b(curl|wget|powershell|bash)\\b.*\\b(https?://)"
+        severity: CRITICAL
+        description: "Backdoor installation by downloading and executing remote code from the extension."
+
+      - pattern: "workspace\\.findFiles\\s*\\(.*\\*\\*/(\\.(env|npmrc|git-credentials|ssh)|credentials)"
+        severity: CRITICAL
+        description: "Workspace-wide scan for credential files to stage data for exfiltration."
+    indicators:
+      files:
+        - "extension.js"
+        - "package.json"
+        - "activate.js"
+      strings:
+        - "claude"
+        - "anthropic"
+        - "globalState"
+        - "getConfiguration"
+        - "child_process"
+        - "vscode.workspace"
