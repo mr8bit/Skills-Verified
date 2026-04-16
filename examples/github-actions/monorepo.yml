@@ -1,0 +1,52 @@
+name: Security Scan (Monorepo)
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  trust-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - path: services/auth
+            name: auth-service
+          - path: services/api
+            name: api-service
+          - path: plugins/formatter
+            name: formatter-plugin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Skills Verified — ${{ matrix.service.name }}
+        id: scan
+        uses: your-org/skills-verified@v1
+        with:
+          source: ${{ matrix.service.path }}
+          threshold: 70
+          threshold-grade: C
+          comment-on-pr: true
+          comment-style: summary
+          generate-badge: true
+
+      - name: Upload report — ${{ matrix.service.name }}
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trust-report-${{ matrix.service.name }}
+          path: trust-report.json
+
+      - name: Upload badge — ${{ matrix.service.name }}
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trust-badge-${{ matrix.service.name }}
+          path: trust-badge.json

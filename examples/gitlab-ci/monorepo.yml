@@ -1,0 +1,26 @@
+include:
+  - remote: 'https://raw.githubusercontent.com/your-org/skills-verified/main/templates/gitlab-ci-skills-verified.yml'
+
+stages:
+  - security
+
+trust-scan:
+  extends: .skills-verified-pip
+  stage: security
+  parallel:
+    matrix:
+      - SV_SOURCE: "services/auth"
+      - SV_SOURCE: "services/api"
+      - SV_SOURCE: "plugins/formatter"
+  variables:
+    SV_THRESHOLD: "70"
+    SV_THRESHOLD_GRADE: "C"
+    SV_COMMENT_ON_MR: "true"
+    SV_COMMENT_STYLE: "summary"
+    SV_GENERATE_BADGE: "true"
+  artifacts:
+    paths:
+      - trust-report.json
+      - trust-badge.json
+    when: always
+    expire_in: 14 days

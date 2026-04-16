@@ -1,0 +1,54 @@
+include:
+  - remote: 'https://raw.githubusercontent.com/your-org/skills-verified/main/templates/gitlab-ci-skills-verified.yml'
+
+stages:
+  - security
+  - deploy
+
+trust-scan:
+  extends: .skills-verified-pip
+  stage: security
+  variables:
+    SV_SOURCE: "."
+    SV_THRESHOLD: "75"
+    SV_THRESHOLD_GRADE: "C"
+    SV_COMMENT_ON_MR: "true"
+    SV_COMMENT_STYLE: "full"
+    SV_GENERATE_BADGE: "true"
+    # Optionally limit analyzers:
+    # SV_SKIP: "llm"
+    # SV_ONLY: "pattern,guardrails,permissions"
+  artifacts:
+    paths:
+      - trust-report.json
+      - trust-badge.json
+    when: always
+    expire_in: 30 days
+
+# ── Docker variant (faster, all scanners pre-installed) ──────────────────
+# Uncomment the job below to use the Docker-based runner instead of pip.
+#
+# trust-scan-docker:
+#   extends: .skills-verified-docker
+#   stage: security
+#   variables:
+#     SV_SOURCE: "."
+#     SV_THRESHOLD: "75"
+#     SV_THRESHOLD_GRADE: "C"
+#     SV_COMMENT_ON_MR: "true"
+#     SV_COMMENT_STYLE: "full"
+#     SV_GENERATE_BADGE: "true"
+#   artifacts:
+#     paths:
+#       - trust-report.json
+#       - trust-badge.json
+#     when: always
+#     expire_in: 30 days
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploy step runs only when trust scan passes"
+  needs:
+    - job: trust-scan
+      artifacts: false

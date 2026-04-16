@@ -1,0 +1,84 @@
+name: Security Scan (Full)
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  trust-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Skills Verified
+        id: scan
+        uses: your-org/skills-verified@v1
+        with:
+          source: .
+          threshold: 75
+          threshold-grade: C
+          comment-on-pr: true
+          comment-style: full
+          generate-badge: true
+          python-version: "3.11"
+          # Optionally skip slow analyzers:
+          # skip: llm
+          # Or run only specific analyzers:
+          # only: pattern,guardrails,permissions
+
+      - name: Upload trust report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trust-report
+          path: trust-report.json
+
+      - name: Upload badge
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trust-badge
+          path: trust-badge.json
+
+      - name: Print scan summary
+        if: always()
+        run: |
+          echo "Trust Score : ${{ steps.scan.outputs.score }}"
+          echo "Grade       : ${{ steps.scan.outputs.grade }}"
+          echo "Passed      : ${{ steps.scan.outputs.passed }}"
+
+  # ── Docker variant (faster, all scanners pre-installed) ──────────────────
+  # Uncomment the job below to use the Docker-based runner instead of pip.
+  #
+  # trust-scan-docker:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     pull-requests: write
+  #
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #
+  #     - name: Run Skills Verified (Docker)
+  #       id: scan
+  #       uses: your-org/skills-verified@v1
+  #       with:
+  #         source: .
+  #         threshold: 75
+  #         threshold-grade: C
+  #         use-docker: true
+  #         comment-on-pr: true
+  #         comment-style: full
+  #         generate-badge: true
+  #
+  #     - name: Upload trust report
+  #       uses: actions/upload-artifact@v4
+  #       if: always()
+  #       with:
+  #         name: trust-report-docker
+  #         path: trust-report.json
