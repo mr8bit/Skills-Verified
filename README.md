@@ -583,63 +583,70 @@ Overall: (75 + 100 + 100 + 70 + 100) / 5 = 89  → Grade B
 
 ## Интеграция с CI/CD
 
+### CLI-флаги для CI
+
+| Флаг | Описание |
+|------|----------|
+| `--threshold N` | Минимальный score (0-100). Exit code 1 если ниже |
+| `--threshold-grade GRADE` | Минимальный грейд (A/B/C/D/F). Exit code 1 если хуже |
+| `--format FORMAT` | Дополнительные форматы: `json`, `codeclimate`, `badge`, `github`, `markdown` (можно указать несколько раз) |
+| `--output-dir DIR` | Директория для артефактов (по умолчанию `.`) |
+| `--markdown-style STYLE` | Детализация Markdown-отчёта: `full` или `summary` |
+
+**Exit codes:** `0` — проверка пройдена, `1` — порог не пройден, `2` — ошибка выполнения.
+
+**Форматы вывода:**
+- `codeclimate` — Code Climate JSON для GitLab Code Quality (файл `gl-code-quality-report.json`)
+- `badge` — shields.io endpoint JSON (файл `badge.json`)
+- `github` — аннотации `::error`/`::warning` для GitHub Actions (в stdout)
+- `markdown` — Markdown-отчёт для PR/MR-комментариев (файл `report.md`)
+
 ### GitHub Actions
 
+**Reusable Action** — подключается одной строкой:
+
 ```yaml
-name: Security Scan
-
-on: [push, pull_request]
-
-jobs:
-  trust-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install Skills Verified
-        run: |
-          git clone https://github.com/your-org/skills-verified.git /tmp/sv
-          pip install -e "/tmp/sv[dev]" bandit semgrep pip-audit
-
-      - name: Run scan
-        run: |
-          skills-verified . --output trust-report.json
-
-      - name: Upload report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trust-report
-          path: trust-report.json
-
-      - name: Fail on low Trust Score
-        run: |
-          python -c "
-          import json, sys
-          r = json.load(open('trust-report.json'))
-          if r['overall_grade'] in ('D', 'F'):
-              print(f'Trust Score too low: {r[\"overall_grade\"]}')
-              sys.exit(1)
-          "
+- uses: your-org/skills-verified@v1
+  with:
+    threshold: 70
+    threshold-grade: C
+    comment-on-pr: 'true'
+    comment-style: full
+    generate-badge: 'true'
 ```
+
+Action автоматически: запускает сканирование, добавляет аннотации в PR, постит Markdown-комментарий, генерирует badge и записывает Job Summary.
+
+Подробнее: [`action.yml`](action.yml) | [Примеры](examples/github-actions/)
 
 ### GitLab CI
 
+**Includable Template** — подключается через `include`:
+
 ```yaml
-trust_scan:
-  image: python:3.11
-  script:
-    - pip install -e "." bandit semgrep pip-audit
-    - skills-verified . --output trust-report.json
-  artifacts:
-    paths:
-      - trust-report.json
-    when: always
+include:
+  - remote: 'https://raw.githubusercontent.com/your-org/skills-verified/main/templates/gitlab-ci-skills-verified.yml'
+
+skills-verified:
+  extends: .skills-verified-pip
+  variables:
+    SV_THRESHOLD: "70"
+    SV_THRESHOLD_GRADE: "C"
 ```
+
+Template автоматически: генерирует Code Quality report, постит комментарий в MR, создаёт badge.json.
+
+Подробнее: [`templates/`](templates/) | [Примеры](examples/gitlab-ci/)
+
+### Badge
+
+Добавьте в README вашего проекта:
+
+```markdown
+![Trust Score](https://img.shields.io/endpoint?url=<URL_TO_BADGE_JSON>)
+```
+
+`badge.json` генерируется через `--format badge` и сохраняется как артефакт CI. Разместите его на GitHub Pages, GitLab Pages или любом публичном URL.
 
 ### Pre-commit hook
 
