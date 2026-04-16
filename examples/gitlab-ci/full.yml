@@ -20,8 +20,8 @@ trust-scan:
     # SV_ONLY: "pattern,guardrails,permissions"
   artifacts:
     paths:
-      - trust-report.json
-      - trust-badge.json
+      - report.json
+      - badge.json
     when: always
     expire_in: 30 days
 
@@ -40,8 +40,8 @@ trust-scan:
 #     SV_GENERATE_BADGE: "true"
 #   artifacts:
 #     paths:
-#       - trust-report.json
-#       - trust-badge.json
+#       - report.json
+#       - badge.json
 #     when: always
 #     expire_in: 30 days
 

@@ -101,13 +101,7 @@ def _build_findings_table(report: Report) -> str:
                 file_col = f"`{finding.file_path}`"
         else:
             file_col = "N/A"
-        confidence = f"{finding.confidence:.2f}".rstrip("0").rstrip(".")
-        # Ensure at least two decimal places representation if needed
-        if "." not in confidence:
-            confidence = f"{finding.confidence:.2f}"
-        else:
-            # Use fixed 2 decimal places for consistency
-            confidence = f"{finding.confidence:.2f}"
+        confidence = f"{finding.confidence:.2f}"
         lines.append(f"| {severity} | {title} | {file_col} | {confidence} |")
     lines.append("")
     return "\n".join(lines)

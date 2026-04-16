@@ -42,11 +42,11 @@ jobs:
         if: always()
         with:
           name: trust-report-${{ matrix.service.name }}
-          path: trust-report.json
+          path: report.json
 
       - name: Upload badge — ${{ matrix.service.name }}
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: trust-badge-${{ matrix.service.name }}
-          path: trust-badge.json
+          path: badge.json

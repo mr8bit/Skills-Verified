@@ -43,19 +43,19 @@ Example: `threshold: 70` + `threshold-grade: C` fails the build when the score i
 | `use-docker` | `SV_USE_DOCKER` | Use the pre-built Docker image instead of pip install. |
 | `comment-on-pr` | `SV_COMMENT_ON_MR` | Post a scan summary as a PR/MR comment (`true`/`false`). |
 | `comment-style` | `SV_COMMENT_STYLE` | Comment verbosity: `full` (all findings) or `summary` (scores only). |
-| `generate-badge` | `SV_GENERATE_BADGE` | Write a `trust-badge.json` shields.io endpoint file. |
+| `generate-badge` | `SV_GENERATE_BADGE` | Write a `badge.json` shields.io endpoint file. |
 | `python-version` | — | Python version for pip-based install (GitHub Actions only). |
 
 ---
 
 ## Badge Setup
 
-When `generate-badge: true` (or `SV_GENERATE_BADGE: "true"`) is set, the action writes a `trust-badge.json` file compatible with the [shields.io endpoint](https://shields.io/endpoint) format.
+When `generate-badge: true` (or `SV_GENERATE_BADGE: "true"`) is set, the action writes a `badge.json` file compatible with the [shields.io endpoint](https://shields.io/endpoint) format.
 
-Upload `trust-badge.json` to a publicly accessible URL (e.g. GitHub Pages, Gist, S3) and then add the badge to your README:
+Upload `badge.json` to a publicly accessible URL (e.g. GitHub Pages, Gist, S3) and then add the badge to your README:
 
 ```markdown
-[![Trust Score](https://img.shields.io/endpoint?url=https://your-host/path/to/trust-badge.json)](https://github.com/your-org/your-repo)
+[![Trust Score](https://img.shields.io/endpoint?url=https://your-host/path/to/badge.json)](https://github.com/your-org/your-repo)
 ```
 
 The badge shows the current grade (A–F) and colour-codes it automatically:

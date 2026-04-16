@@ -36,14 +36,14 @@ jobs:
         if: always()
         with:
           name: trust-report
-          path: trust-report.json
+          path: report.json
 
       - name: Upload badge
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: trust-badge
-          path: trust-badge.json
+          path: badge.json
 
       - name: Print scan summary
         if: always()
@@ -81,4 +81,4 @@ jobs:
   #       if: always()
   #       with:
   #         name: trust-report-docker
-  #         path: trust-report.json
+  #         path: report.json

@@ -44,8 +44,10 @@ variables:
       fi
 
       if [ "${SV_GENERATE_BADGE}" = "true" ]; then
-        CMD="${CMD} --output-dir ."
+        CMD="${CMD} --format badge"
       fi
+
+      CMD="${CMD} --output-dir ."
 
       if [ -n "${SV_COMMENT_STYLE}" ]; then
         CMD="${CMD} --markdown-style ${SV_COMMENT_STYLE}"
@@ -106,8 +108,10 @@ variables:
       fi
 
       if [ "${SV_GENERATE_BADGE}" = "true" ]; then
-        CMD="${CMD} --output-dir /reports"
+        CMD="${CMD} --format badge"
       fi
+
+      CMD="${CMD} --output-dir /reports"
 
       if [ -n "${SV_COMMENT_STYLE}" ]; then
         CMD="${CMD} --markdown-style ${SV_COMMENT_STYLE}"

@@ -204,7 +204,7 @@ runs:
 
     # ── 5. Comment on PR ─────────────────────────────────────────────────────
     - name: Comment on PR
-      if: inputs.comment-on-pr == 'true' && github.event_name == 'pull_request'
+      if: always() && inputs.comment-on-pr == 'true' && github.event_name == 'pull_request'
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
@@ -218,6 +218,7 @@ runs:
 
     # ── 6. Upload artifacts ───────────────────────────────────────────────────
     - name: Upload scan artifacts
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: skills-verified-report
