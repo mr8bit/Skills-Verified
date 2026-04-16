@@ -1,5 +1,3 @@
-import pytest
-from unittest.mock import patch
 from skills_verified.core.models import Category, Finding, Severity
 from skills_verified.output.github_annotations import format_annotations, print_annotations
 

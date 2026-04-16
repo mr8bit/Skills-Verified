@@ -29,7 +29,7 @@ from skills_verified.analyzers.supply_chain_analyzer import SupplyChainAnalyzer
 from skills_verified.core.pipeline import Pipeline
 from skills_verified.output.console import render_report
 from skills_verified.output.json_report import save_json_report
-from skills_verified.repo.fetcher import fetch_repo, is_git_url
+from skills_verified.repo.fetcher import fetch_repo
 
 console = Console()
 

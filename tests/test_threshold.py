@@ -1,4 +1,4 @@
-from skills_verified.cli import GRADE_ORDER, check_threshold
+from skills_verified.cli import check_threshold
 from skills_verified.core.models import Grade
 
 

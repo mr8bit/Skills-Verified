@@ -1,6 +1,4 @@
 import json
-import re
-from pathlib import Path
 
 import pytest
 
@@ -48,7 +46,7 @@ def test_fingerprint_is_hex_string():
     issues = generate_codeclimate([finding])
     fp = issues[0]["fingerprint"]
     assert len(fp) == 64
-    assert re.fullmatch(r"[0-9a-f]{64}", fp), f"Not a valid SHA256 hex: {fp}"
+    assert all(c in "0123456789abcdef" for c in fp), f"Not a valid SHA256 hex: {fp}"
 
 
 def test_different_findings_get_different_fingerprints():
